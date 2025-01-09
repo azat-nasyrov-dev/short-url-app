@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { UrlEntity } from './url.entity';
 
 @Entity('urls_clicks')
@@ -12,6 +19,7 @@ export class UrlClickEntity {
   @Column({ name: 'ip_address' })
   ipAddress: string;
 
-  @ManyToOne(() => UrlEntity, (url) => url.clicks, { onDelete: 'CASCADE' })
+  @ManyToOne(() => UrlEntity, (url) => url.clicks, { cascade: true, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'url_id' })
   url: UrlEntity;
 }
