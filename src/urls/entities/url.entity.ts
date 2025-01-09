@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { UrlClickEntity } from './url-click.entity';
 
 @Entity('urls')
 export class UrlEntity {
@@ -19,4 +20,7 @@ export class UrlEntity {
 
   @Column({ name: 'expires_at', type: 'timestamp', nullable: true })
   expiresAt?: Date;
+
+  @OneToMany(() => UrlClickEntity, (click) => click.url)
+  clicks: UrlClickEntity[];
 }
