@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Post, Res } from '@nestjs/common';
-import { Response } from 'express';
+import { Body, Controller, Delete, Get, Param, Post, Req, Res } from '@nestjs/common';
+import { Response, Request } from 'express';
 import { UrlsService } from './urls.service';
 import { UrlEntity } from './entities/url.entity';
 
@@ -20,8 +20,11 @@ export class UrlsController {
   public async redirectToOriginalUrl(
     @Param('shortUrl') shortUrl: string,
     @Res() res: Response,
+    @Req() req: Request,
   ): Promise<void> {
-    const originalUrl = await this.urlsService.redirectToOriginalUrl(shortUrl);
+    const ipAddress =
+      req.headers['x-forwarded-for']?.toString() || req.socket.remoteAddress || 'unknown';
+    const originalUrl = await this.urlsService.redirectToOriginalUrl(shortUrl, ipAddress);
     return res.status(302).redirect(originalUrl);
   }
 
@@ -34,5 +37,12 @@ export class UrlsController {
   public async deleteShortUrl(@Param('shortUrl') shortUrl: string): Promise<{ message: string }> {
     await this.urlsService.deleteShortUrl(shortUrl);
     return { message: 'Short URL deleted successfully' };
+  }
+
+  @Get('analytics/:shortUrl')
+  public async getAnalytics(
+    @Param('shortUrl') shortUrl: string,
+  ): Promise<{ clickCount: number; recentClicks: string[] }> {
+    return await this.urlsService.getAnalytics(shortUrl);
   }
 }
