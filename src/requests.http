@@ -3,14 +3,15 @@ POST http://localhost:3001/api/shorten
 Content-Type: application/json
 
 {
-  "originalUrl": "https://jsonplaceholder.typicode.com/"
+  "originalUrl": "https://jsonplaceholder.typicode.com/",
+  "expiresAt": "2025-01-09T11:45:00.000Z"
 }
 
 ### Redirect to original url
-GET http://localhost:3001/api/3d0672
+GET http://localhost:3001/api/a33ed6
 
 ### Get info about url
-GET http://localhost:3001/api/info/3d0672
+GET http://localhost:3001/api/info/a33ed6
 
 ### Delete short url
-DELETE http://localhost:3001/api/delete/3d0672
+DELETE http://localhost:3001/api/delete/a33ed6
