@@ -1,5 +1,5 @@
 import {
-  BadRequestException,
+  BadRequestException, GoneException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -19,7 +19,7 @@ export class UrlsService {
     private readonly urlRepository: Repository<UrlEntity>,
   ) {}
 
-  public async createShortUrl(originalUrl: string): Promise<UrlEntity> {
+  public async createShortUrl(originalUrl: string, expiresAt?: Date): Promise<UrlEntity> {
     try {
       const existingUrl = await this.urlRepository.findOneBy({ originalUrl });
       if (existingUrl) {
@@ -27,7 +27,7 @@ export class UrlsService {
       }
 
       const shortUrl = crypto.randomBytes(3).toString('hex');
-      const url = this.urlRepository.create({ originalUrl, shortUrl });
+      const url = this.urlRepository.create({ originalUrl, shortUrl, expiresAt });
       return await this.urlRepository.save(url);
     } catch (err) {
       this.logger.error('Error during creation short URL:', err);
@@ -42,8 +42,12 @@ export class UrlsService {
   public async redirectToOriginalUrl(shortUrl: string): Promise<string> {
     try {
       const url = await this.urlRepository.findOneBy({ shortUrl });
+
       if (!url) {
         throw new NotFoundException('Short URL not found');
+      }
+      if (url.expiresAt && url.expiresAt < new Date()) {
+        throw new GoneException('Short URL has expired');
       }
 
       url.clickCount += 1;
@@ -51,7 +55,7 @@ export class UrlsService {
       return url.originalUrl;
     } catch (err) {
       this.logger.error('Error during redirect:', err);
-      if (err instanceof NotFoundException) {
+      if (err instanceof NotFoundException || err instanceof GoneException) {
         throw err;
       }
 

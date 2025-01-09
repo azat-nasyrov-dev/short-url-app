@@ -8,8 +8,12 @@ export class UrlsController {
   constructor(private readonly urlsService: UrlsService) {}
 
   @Post('shorten')
-  public async createShortUrl(@Body('originalUrl') originalUrl: string): Promise<UrlEntity> {
-    return await this.urlsService.createShortUrl(originalUrl);
+  public async createShortUrl(
+    @Body('originalUrl') originalUrl: string,
+    @Body('expiresAt') expiresAt?: string,
+  ): Promise<UrlEntity> {
+    const expiresAtDate = expiresAt ? new Date(expiresAt) : undefined;
+    return await this.urlsService.createShortUrl(originalUrl, expiresAtDate);
   }
 
   @Get(':shortUrl')
