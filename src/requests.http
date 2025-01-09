@@ -1,0 +1,16 @@
+### Create short url
+POST http://localhost:3001/api/shorten
+Content-Type: application/json
+
+{
+  "originalUrl": "https://jsonplaceholder.typicode.com/"
+}
+
+### Redirect to original url
+GET http://localhost:3001/api/3d0672
+
+### Get info about url
+GET http://localhost:3001/api/info/3d0672
+
+### Delete short url
+DELETE http://localhost:3001/api/delete/3d0672
