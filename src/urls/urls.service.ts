@@ -1,5 +1,6 @@
 import {
-  BadRequestException, GoneException,
+  BadRequestException,
+  GoneException,
   Injectable,
   InternalServerErrorException,
   Logger,
