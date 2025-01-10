@@ -1,5 +1,5 @@
 ### Create short url
-POST http://localhost:3001/api/shorten
+POST http://localhost:3001/shorten
 Content-Type: application/json
 
 {
@@ -9,14 +9,14 @@ Content-Type: application/json
 }
 
 ### Redirect to original url
-GET http://localhost:3001/api/mycustomalias
+GET http://localhost:3001/mycustomalias
 
 ### Get info about url
-GET http://localhost:3001/api/info/mycustomalias
+GET http://localhost:3001/info/mycustomalias
 
 ### Get analytics
-GET http://localhost:3001/api/analytics/e29d0f
+GET http://localhost:3001/analytics/35127e
 
 ### Delete short url
-DELETE http://localhost:3001/api/delete/mycustomalias
+DELETE http://localhost:3001/delete/mycustomalias
 

@@ -1,4 +1,4 @@
-import { IsDate, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateShortUrlDto {
   @IsNotEmpty()
@@ -11,6 +11,5 @@ export class CreateShortUrlDto {
   readonly customAlias?: string;
 
   @IsOptional()
-  @IsDate()
   readonly expiresAt?: Date;
 }
