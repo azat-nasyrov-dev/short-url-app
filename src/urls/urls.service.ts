@@ -71,12 +71,12 @@ export class UrlsService {
         ipAddress: ipAddress || '0.0.0.0',
         url,
       });
+      console.log('Click entity before save:', click);
+      console.log('URL Entity ID:', click.url.id);
 
-      console.log('Click entity:', click);
-      console.log('URL ID:', click.url?.id);
-
-      await this.urlClickRepository.save(click);
-      await this.urlRepository.save(url);
+      await urlClickRepository.save(click);
+      console.log('Click entity after save:', click);
+      await urlRepository.save(url);
       await queryRunner.commitTransaction();
 
       return url.originalUrl;
