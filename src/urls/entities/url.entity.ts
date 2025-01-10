@@ -12,6 +12,9 @@ export class UrlEntity {
   @Column({ name: 'short_url', type: 'text', unique: true })
   shortUrl: string;
 
+  @Column({ name: 'custom_alias', type: 'text', unique: true, nullable: true })
+  customAlias?: string;
+
   @Column({ name: 'click_count', type: 'int', default: 0 })
   clickCount: number;
 

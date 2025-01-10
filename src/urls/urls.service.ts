@@ -24,15 +24,31 @@ export class UrlsService {
     private readonly dataSource: DataSource,
   ) {}
 
-  public async createShortUrl(originalUrl: string, expiresAt?: Date): Promise<UrlEntity> {
+  public async createShortUrl(
+    originalUrl: string,
+    expiresAt?: Date,
+    customAlias?: string,
+  ): Promise<UrlEntity> {
     try {
+      if (customAlias) {
+        const aliasExists = await this.urlRepository.findOneBy({ customAlias });
+        if (aliasExists) {
+          throw new BadRequestException('Custom alias already in use');
+        }
+      }
+
       const existingUrl = await this.urlRepository.findOneBy({ originalUrl });
       if (existingUrl) {
         throw new BadRequestException('This URL has already been shortened');
       }
 
       const shortUrl = crypto.randomBytes(3).toString('hex');
-      const url = this.urlRepository.create({ originalUrl, shortUrl, expiresAt });
+      const url = this.urlRepository.create({
+        originalUrl,
+        shortUrl,
+        customAlias,
+        expiresAt,
+      });
       return await this.urlRepository.save(url);
     } catch (err) {
       this.logger.error('Error during creation short URL:', err);
@@ -44,7 +60,7 @@ export class UrlsService {
     }
   }
 
-  public async redirectToOriginalUrl(shortUrl: string, ipAddress: string): Promise<string> {
+  public async redirectToOriginalUrl(shortOrAlias: string, ipAddress: string): Promise<string> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -54,12 +70,12 @@ export class UrlsService {
       const urlClickRepository = queryRunner.manager.getRepository(UrlClickEntity);
 
       const url = await urlRepository.findOne({
-        where: { shortUrl },
+        where: [{ shortUrl: shortOrAlias }, { customAlias: shortOrAlias }],
         relations: ['clicks'],
       });
 
       if (!url) {
-        throw new NotFoundException('Short URL not found');
+        throw new NotFoundException('Short URL or custom alias not found');
       }
       if (url.expiresAt && url.expiresAt < new Date()) {
         throw new GoneException('Short URL has expired');
@@ -93,11 +109,13 @@ export class UrlsService {
     }
   }
 
-  public async getUrlInfo(shortUrl: string): Promise<Partial<UrlEntity>> {
+  public async getUrlInfo(shortOrAlias: string): Promise<Partial<UrlEntity>> {
     try {
-      const url = await this.urlRepository.findOneBy({ shortUrl });
+      const url = await this.urlRepository.findOne({
+        where: [{ shortUrl: shortOrAlias }, { customAlias: shortOrAlias }],
+      });
       if (!url) {
-        throw new NotFoundException('Short URL not found');
+        throw new NotFoundException('Short URL or custom alias not found');
       }
 
       return {
@@ -115,11 +133,13 @@ export class UrlsService {
     }
   }
 
-  public async deleteShortUrl(shortUrl: string): Promise<void> {
+  public async deleteShortUrl(shortOrAlias: string): Promise<void> {
     try {
-      const url = await this.urlRepository.findOneBy({ shortUrl });
+      const url = await this.urlRepository.findOne({
+        where: [{ shortUrl: shortOrAlias }, { customAlias: shortOrAlias }],
+      });
       if (!url) {
-        throw new NotFoundException('Short URL not found');
+        throw new NotFoundException('Short URL or custom alias not found');
       }
 
       await this.urlRepository.remove(url);
