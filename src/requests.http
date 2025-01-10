@@ -4,18 +4,19 @@ Content-Type: application/json
 
 {
   "originalUrl": "https://jsonplaceholder.typicode.com/",
-  "expiresAt": "2025-01-09T17:50:00.000Z"
+  "expiresAt": "2025-01-10T15:50:00.000Z",
+  "customAlias": "mycustomalias"
 }
 
 ### Redirect to original url
-GET http://localhost:3001/api/c28cc1
+GET http://localhost:3001/api/mycustomalias
 
 ### Get info about url
-GET http://localhost:3001/api/info/c28cc1
+GET http://localhost:3001/api/info/mycustomalias
 
 ### Get analytics
-GET http://localhost:3001/api/analytics/c28cc1
+GET http://localhost:3001/api/analytics/e29d0f
 
 ### Delete short url
-DELETE http://localhost:3001/api/delete/c28cc1
+DELETE http://localhost:3001/api/delete/mycustomalias
 
